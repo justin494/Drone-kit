@@ -15,17 +15,14 @@ gnd_speed=40
 
 def arm_and_takeoff(aTargetAltitude):
     print("Basic pre-arm checks")
-    # Don't try to arm until autopilot is ready
+    # WAIT UNTIL THE AUTOPILOT IS READY
     while not vehicle.is_armable:
         print(" Waiting for vehicle to initialise...")
         time.sleep(1)
 
     print("Arming motors")
-    # Copter should arm in GUIDED mode
     vehicle.mode = VehicleMode("GUIDED")
     vehicle.armed = True
-
-    # Confirm vehicle armed before attempting to take off
     while not vehicle.armed:
         print(" Waiting for arming...")
         time.sleep(1)
@@ -33,12 +30,9 @@ def arm_and_takeoff(aTargetAltitude):
     print("Taking off!")
     vehicle.simple_takeoff(aTargetAltitude)  # Take off to target altitude
 
-    # Wait until the vehicle reaches a safe height before processing the goto
-    #  (otherwise the command after Vehicle.simple_takeoff will execute
-    #   immediately).
+ 
     while True:
         print(" Altitude: ", vehicle.location.global_relative_frame.alt)
-        # Break and return from function just below target altitude.
         if vehicle.location.global_relative_frame.alt >= aTargetAltitude * 0.95:
             print("Reached target altitude")
             break
@@ -49,15 +43,14 @@ def send_ned_velocity(velocity_x, velocity_y, velocity_z, duration):
     Move vehicle in direction based on specified velocity vectors.
     """
     msg = vehicle.message_factory.set_position_target_local_ned_encode(
-        0,       # time_boot_ms (not used)
-        0, 0,    # target system, target component
-        mavutil.mavlink.MAV_FRAME_LOCAL_NED, # frame
-        0b0000111111000111, # type_mask (only speeds enabled)
-        0, 0, 0, # x, y, z positions (not used)
-        velocity_x, velocity_y, velocity_z, # x, y, z velocity in m/s
-        0, 0, 0, # x, y, z acceleration (not supported yet, ignored in GCS_Mavlink)
-        0, 0)    # yaw, yaw_rate (not supported yet, ignored in GCS_Mavlink)
-
+        0,       
+        0, 0,    
+        mavutil.mavlink.MAV_FRAME_LOCAL_NED, 
+        0b0000111111000111, 
+        0, 0, 0, 
+        velocity_x, velocity_y, velocity_z, 
+        0, 0, 0, 
+        0, 0)    
 
     # send command to vehicle 
     for x in range(0,duration):
@@ -65,19 +58,18 @@ def send_ned_velocity(velocity_x, velocity_y, velocity_z, duration):
         time.sleep(1)
 def condition_yaw(heading, relative=False):
     if relative:
-        is_relative=1 #yaw relative to direction of travel
+        is_relative=1 
     else:
-        is_relative=0 #yaw is an absolute angle
-    # create the CONDITION_YAW command using command_long_encode()
+        is_relative=0 
     msg = vehicle.message_factory.command_long_encode(
-        0, 0,    # target system, target component
-        mavutil.mavlink.MAV_CMD_CONDITION_YAW, #command
-        0, #confirmation
-        heading,    # param 1, yaw in degrees
-        0,          # param 2, yaw speed deg/s
-        1,          # param 3, direction -1 ccw, 1 cw
-        is_relative, # param 4, relative offset 1, absolute angle 0
-        0, 0, 0)    # param 5 ~ 7 not used
+        0, 0,    
+        mavutil.mavlink.MAV_CMD_CONDITION_YAW, 
+        0,
+        heading,    
+        0,         
+        1,         
+        is_relative, 
+        0, 0, 0)   
     # send command to vehicle
     vehicle.send_mavlink(msg)
 
@@ -89,7 +81,7 @@ def keyboard():
         event = pygame.event.wait()  
         if event.type == pygame.QUIT:  
             break  
-   #WHEN THE KEY IS PRESSED
+   #PRESS THE KEYS TO MOVE THE DRONE
         if  event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:  #UP ARROW=FORWARD
                     print("moving forward") 
@@ -103,7 +95,7 @@ def keyboard():
                 elif event.key == pygame.K_RIGHT:
                     print("moving right ")
                     send_ned_velocity(0,gnd_speed,0,4)  #
-                elif event.key == pygame.K_SPACE:             #SPACE BAR= UP
+                elif event.key == pygame.K_SPACE:             #W BAR= UP
                     print("moving up ")
                     send_ned_velocity(0,0,-gnd_speed,4)
                 elif event.key == pygame.K_s:                  #S BUTTON= DOWN
@@ -143,12 +135,5 @@ def keyboard():
                 elif event.key == pygame.K_d:              #D button=yaw right
                     print("STOP yaw right")
                     condition_yaw(0,1)
-                
-
-           
-
-        
-
-    # main function
 arm_and_takeoff(50) 
 keyboard()
