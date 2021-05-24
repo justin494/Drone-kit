@@ -131,7 +131,7 @@ def keyboard():
                 elif event.key == pygame.K_RIGHT:
                     print(" STOP moving right ")
                     send_ned_velocity(0,0,0,1)
-                elif event.key == pygame.K_SPACE:
+                elif event.key == pygame.K_w:
                     print(" STOP moving up ")
                     send_ned_velocity(0,0,0,1)
                 elif event.key == pygame.K_s:
