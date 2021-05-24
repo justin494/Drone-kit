@@ -21,8 +21,4 @@ def moveForward():
 
 # vehicle.simple_goto()
 print(vehicle.home_location)
-© 2021 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
+
